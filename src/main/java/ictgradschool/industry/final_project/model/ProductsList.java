@@ -15,27 +15,45 @@ public class ProductsList {
     // Input file within resources directory
     private static String INPUT_FILE_NAME = "";
 
-    private static List<Product> products;
+    //private static List<Product> products;
+    private static HashMap<String, Product> products;
+
+    /*
+     * An indexed collection of the Product objects stored in the results
+     * hashtable. This essentially provides an index offering direct access to
+     * any StudentResult object stored.
+     */
+    private List<Product> _indexedResults;
     private static List<String> productIds = new ArrayList<>();
     private Set<ProductsListListener> listeners ;
 
 
     public ProductsList() {
-        products = new ArrayList<>();
+        products = new HashMap<String, Product>();
         listeners = new HashSet<>();
+        _indexedResults = new ArrayList<>();
     }
 
     public void add(Product product) {
+        products.put(product.getId(), product);
+        productIds.add(product.getId());
+        _indexedResults = new ArrayList<>(products.values());
+        for(ProductsListListener listener : listeners) {
+            listener.projectDataAdded(this , product.getId(), size()-1);
+        }
 
-        //products.add(product);
     }
 
     public void delete(int index) {
         String id = products.get(index).getId();
         products.remove(index);
+        productIds.remove(index);
+        _indexedResults.remove(index);
+
         for (ProductsListListener l : listeners) {
             l.projectDataRemoved(this, id);
         }
+
     }
 
     public void addListener(ProductsListListener listener) {
@@ -47,11 +65,11 @@ public class ProductsList {
     }
 
     public int size() {
-        return products.size();
+        return _indexedResults.size();
     }
 
     public Product get(int index) {
-        return products.get(index);
+        return _indexedResults.get(index);
     }
 
 
@@ -118,6 +136,7 @@ public class ProductsList {
      * Attempts to deserialise a List of ProjectResult objects from disk.
      */
     public static List<Product> readData() {
+        List<Product> csvProducts = new ArrayList<>();
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(DATA_FILE_NAME))) {
             // Read the number of entries the stream contains
             int count = ois.readInt();
@@ -125,8 +144,7 @@ public class ProductsList {
             // Attempt to read each object from the stream
             for (int i = 0; i < count; i++) {
                 Product p = (Product) ois.readObject();
-                products.add(p);
-                productIds.add(p.getId());
+                csvProducts.add(p);
             }
             ois.close();
             System.out.println("Read " + products.size() + " products records.");
@@ -139,19 +157,21 @@ public class ProductsList {
         } catch (ClassNotFoundException e) {
             System.out.println("Deserialization of object failed, no matching class found.");
         }
-        return products;
+        return csvProducts;
     }
 
     public void saveFile(Boolean append) {
-        List<Product> data = new ArrayList<>();
+        Map<String, Product> data = new HashMap<>();
         if (append == true) {
-            data.add(this.get(this.size() - 1));
+            Product product = this.get(this.size() - 1);
+            data.put(product.getId(), product);
         } else {
             data = this.products;
         }
 
         try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(INPUT_FILE_NAME, append))) {
-            for (Product product : data) {
+            for (String key : data.keySet()) {
+                Product product = data.get(key);
                 StringBuffer sbf = new StringBuffer();//拼接内容
                 sbf.append(product.getId()).append(",");
                 sbf.append(product.getName()).append(",");

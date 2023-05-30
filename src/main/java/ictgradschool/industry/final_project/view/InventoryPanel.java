@@ -22,8 +22,7 @@ public class InventoryPanel extends SuperPanel{
         super(app);
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(600, 450));
-        model = new ProductsList();
-        tableView = new JTable(new InventoryTableAdapter(model));
+        tableView = new JTable(new InventoryTableAdapter(app.getProductsList()));
         add(new JScrollPane(tableView), BorderLayout.CENTER);
     }
 

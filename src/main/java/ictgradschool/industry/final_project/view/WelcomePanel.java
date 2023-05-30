@@ -8,6 +8,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -70,27 +72,36 @@ public class WelcomePanel extends SuperPanel implements ActionListener {
     /*
      * Nested inner class to load Course data from file using a separate thread.
      */
-    private class Worker extends SwingWorker<java.util.List<Product>, Void> {
+    private class Worker extends SwingWorker<List<Product>, Void> {
 
         @Override
-        protected java.util.List<Product> doInBackground() {
+        protected List<Product> doInBackground() {
             System.out.println("Loading data...");
             return ProductsList.readData();
         }
 
         @Override
         protected void done() {
-            List<Product> data;
+            System.out.println("Done.");
+            List<Product> Loaddata;
             try {
-                data = get();
-                if (data == null) {
+                Loaddata = get();
+                if (Loaddata == null) {
 
                 } else {
                     // Populate the Course model object with the loaded data.
-                    for (Product result : data) {
-                        System.out.println("Loaded " + data.size() + " products.");
-                        app.getProductsList().add(result);
+                    Iterator<Product> iterator = Loaddata.iterator();
+
+                    while (iterator.hasNext()) {
+                        Product product = iterator.next();
+                        System.out.println(product);
+                        app.getProductsList().add(product);
                     }
+
+//                    for (Product result : Loaddata) {
+//                        System.out.println("Loaded " + Loaddata.size() + " products.");
+//                        app.getProductsList().add(result);
+//                    }
                 }
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();

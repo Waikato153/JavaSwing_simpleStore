@@ -77,7 +77,4 @@ public class InventoryTableAdapter extends AbstractTableModel implements Product
     public void projectDataChanged(ProductsList model, int index, String oldValue, String newValue) {
         fireTableDataChanged();
     }
-    public Class getColumnClass(int column) {
-        return getValueAt(0, column).getClass();
-    }
 }
