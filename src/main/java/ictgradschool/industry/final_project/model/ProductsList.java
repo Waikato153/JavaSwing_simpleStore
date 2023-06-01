@@ -1,6 +1,8 @@
 package ictgradschool.industry.final_project.model;
 
 import ictgradschool.industry.final_project.admin.ProductResultBuilder;
+import ictgradschool.industry.final_project.model.worker.SaveWorker;
+import ictgradschool.industry.final_project.util.productAction;
 
 import java.io.*;
 import java.net.URL;
@@ -27,6 +29,8 @@ public class ProductsList {
     private static List<String> productIds = new ArrayList<>();
     private Set<ProductsListListener> listeners ;
 
+    private HashSet<String> _selectedIds = new HashSet<>();
+
 
     public ProductsList() {
         products = new HashMap<String, Product>();
@@ -38,23 +42,50 @@ public class ProductsList {
         products.put(product.getId(), product);
         productIds.add(product.getId());
         _indexedResults = new ArrayList<>(products.values());
+        Collections.sort(_indexedResults, (a, b) -> Integer.valueOf(b.getPrimarykey()).compareTo(Integer.valueOf(a.getPrimarykey())));
         for(ProductsListListener listener : listeners) {
             listener.projectDataAdded(this , product.getId(), size()-1);
         }
 
     }
 
-    public void delete(int index) {
-        String id = products.get(index).getId();
-        products.remove(index);
-        productIds.remove(index);
-        _indexedResults.remove(index);
-
-        for (ProductsListListener l : listeners) {
-            l.projectDataRemoved(this, id);
+    public void batchDelete() {
+        for (String element : _selectedIds) {
+            products.remove(element);
+            productIds.remove(element);
         }
 
+        Iterator<Product> iterator = _indexedResults.iterator();
+        while (iterator.hasNext()) {
+            Product product = iterator.next();
+            if (_selectedIds.contains(product.getId())) {
+                iterator.remove();
+            }
+        }
+
+        for (ProductsListListener l : listeners) {
+            l.projectDataRemoved(this);
+        }
+        clearSelectedIds();
+        triggerSave();
     }
+
+    public void addSelect(String id) {
+        _selectedIds.add(id);
+    }
+
+    public void removeSelect(String id) {
+        _selectedIds.remove(id);
+    }
+
+    public HashSet<String> getSelectedIds() {
+        return _selectedIds;
+    }
+
+    public void clearSelectedIds() {
+        _selectedIds.clear();
+    }
+
 
     public void addListener(ProductsListListener listener) {
         listeners.add(listener);
@@ -92,9 +123,6 @@ public class ProductsList {
         List<Product> results = new ArrayList<>();
         // Open the input CSV file for processing
         try (Scanner sc = new Scanner(new File(ProductsList.INPUT_FILE_NAME))) {
-            if (!sc.hasNextLine()) {
-                return;
-            }
 
             sc.useDelimiter(",|\n|\r\n");
 
@@ -103,14 +131,19 @@ public class ProductsList {
 
             // Read each CSV row
             while (sc.hasNext()) {
+                String id = sc.next();
+                if (id.isBlank() || id.isEmpty()) {
+                    break;
+                }
 
                 // Use a Builder pattern to generate a StudentResult object from data as it is read
                 results.add(
-                        srb.id(sc.next())
+                        srb.id(id)
                                 .name(sc.next())
                                 .description(sc.next())
                                 .price(sc.nextDouble())
                                 .quantity(sc.nextInt())
+                                .primarykey(sc.nextInt())
                                 .getProductResult(true));
             }
         } catch (FileNotFoundException e) {
@@ -160,36 +193,45 @@ public class ProductsList {
         return csvProducts;
     }
 
-    public void saveFile(Boolean append) {
+    public void saveFile(Boolean append, String pid) {
+        System.out.println("Saving to file...");
+        System.out.println("Append: " + append);
+        System.out.println("PID: " + pid);
+        System.out.println("Products: " + this.products);
         Map<String, Product> data = new HashMap<>();
-        if (append == true) {
-            Product product = this.get(this.size() - 1);
-            data.put(product.getId(), product);
+        if (append == true && pid != null) {
+            data.put(pid, this.products.get(pid));
         } else {
             data = this.products;
         }
 
         try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(INPUT_FILE_NAME, append))) {
-            for (String key : data.keySet()) {
-                Product product = data.get(key);
-                StringBuffer sbf = new StringBuffer();//拼接内容
-                sbf.append(product.getId()).append(",");
-                sbf.append(product.getName()).append(",");
-                sbf.append(product.getDescription()).append(",");
-                sbf.append(product.getPrice()).append(",");
-                sbf.append(product.getQuantity());
-                sbf.append(System.lineSeparator());
-                String str = sbf.toString();
-                byte[] b = str.getBytes();
-                for(int i=0; i<b.length; i++) {
-                    out.write(b[i]);
+            if (data.size() == 0) {
+                out.write("".getBytes());
+            } else {
+                for (String key : data.keySet()) {
+                    Product product = data.get(key);
+                    StringBuffer sbf = new StringBuffer();//拼接内容
+                    sbf.append(product.getId()).append(",");
+                    sbf.append(product.getName()).append(",");
+                    sbf.append(product.getDescription()).append(",");
+                    sbf.append(product.getPrice()).append(",");
+                    sbf.append(product.getQuantity()).append(",");
+                    sbf.append(product.getPrimarykey());
+                    sbf.append(System.lineSeparator());
+                    String str = sbf.toString();
+                    byte[] b = str.getBytes();
+                    for (int i = 0; i < b.length; i++) {
+                        out.write(b[i]);
+                    }
                 }
             }
         }catch (Exception e) {
             e.printStackTrace();
         }
-
-
     }
-
+    public void triggerSave() {
+        SaveWorker saveWorker = new SaveWorker(this, productAction.Edit,null);
+        saveWorker.execute();
+    }
 }

@@ -55,6 +55,8 @@ public class ProductResultBuilder {
     private double price;
     private int quantity;
 
+    private int primarykey;
+
     /**
      * Construct a new instance of ProductResultBuilder, with fields initialised to defaults
      */
@@ -71,6 +73,7 @@ public class ProductResultBuilder {
         this.description = null;
         this.price = 0.0;
         this.quantity = 0;
+        this.primarykey = 0;
     }
 
     /**
@@ -81,6 +84,16 @@ public class ProductResultBuilder {
      */
     public ProductResultBuilder id(String id) {
         this.id = id;
+        return this;
+    }
+    /**
+     * <p>Set the <code>primarykey</code> field for a ProductResult</p>
+     *
+     * @param primarykey primarykey number of the product
+     * @return ProductResultBuilder reference for chaining calls
+     */
+    public ProductResultBuilder primarykey(int primarykey) {
+        this.primarykey = primarykey;
         return this;
     }
 
@@ -161,7 +174,7 @@ public class ProductResultBuilder {
             throw new BuilderException("ProductResultBuilder.getProductResult :: unable to construct ProductResult with null name");
         }
         // Complexity of wrapping mark values in a Percentage object is masked by the Builder
-        Product sr = new Product(this.id, this.name, this.description, this.price, this.quantity);
+        Product sr = new Product(this.id, this.name, this.description, this.price, this.quantity,this.primarykey);
 
         if (shouldReset) { this.reset(); }
 

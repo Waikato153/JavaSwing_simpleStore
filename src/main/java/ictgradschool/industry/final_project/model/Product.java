@@ -13,6 +13,16 @@ public class Product implements Serializable {
     private double price;
     private int quantity;
 
+    private boolean selected;
+
+    public int getPrimarykey() {
+        return primarykey;
+    }
+    public void setPrimarykey(int primarykey) {
+        this.primarykey = primarykey;
+    }
+
+    private int primarykey;
     public String getId() {
         return id;
     }
@@ -53,12 +63,22 @@ public class Product implements Serializable {
         this.quantity = quantity;
     }
 
-    public Product(String id, String name, String description, double price,int quantity) {
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
+    public Product(String id, String name, String description, double price,int quantity,int primarykey) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
         this.quantity = quantity;
+        this.primarykey = primarykey;
+        this.selected = false;
     }
 
     @Override
@@ -80,7 +100,7 @@ public class Product implements Serializable {
 
     @Override
     public String toString() {
-        return getId() + " " + getName() + " " + getDescription() + " " + getPrice() + " " + getQuantity();
+        return getId() + " " + getName() + " " + getDescription() + " " + getPrice() + " " + getQuantity() + " " + getPrimarykey();
     }
 
 

@@ -2,6 +2,7 @@ package ictgradschool.industry.final_project.view.product;
 
 import ictgradschool.industry.final_project.ProjectUI;
 import ictgradschool.industry.final_project.control.productCheck;
+import ictgradschool.industry.final_project.model.Product;
 import ictgradschool.industry.final_project.view.SuperPanel;
 
 import java.awt.*;
@@ -23,42 +24,49 @@ public class productPanel extends SuperPanel {
 	JTextField text3 = new JTextField();
 	JTextField text4 = new JTextField();
 
+	JTextField text5 = new JTextField();
+	JTextField text6 = new JTextField();
+
 	
-	JButton but1 = new JButton("Create");//创建按钮
+	JButton but1 = new JButton("Create");//create button
 	JButton but2 = new JButton("Reset");
 	
-	String id,name,description, price, quantity;//创建信息存储空间
+	String id, name,description, price, quantity, primarykey;
 
 	private JPanel panel = new JPanel();
 
+	private Product product;
+
 	public productPanel(ProjectUI app) {
 		super(app);
-		panel.setLayout(null);//取消容器默认布局流
+		panel.setLayout(null);//call default layout
 	}
 
 
 	/**
-	 * 为窗体设置界面容器并添加必要组件
+	 * add component to form panel
 	 * @param frame
 	 * @return JPanel
 	 */
 	public JPanel panel(JFrame frame) {
-		panel.add(nameLabel());//向容器中添加标签组件
+		panel.add(nameLabel());//add label
 		panel.add(descriptionLabel());
 		panel.add(priceLabel());
 		panel.add(quantityLabel());
 		
-		panel.add(nameText());//向容器中添加文本框组件
-
+		panel.add(nameText());//add textarea
 		panel.add(priceText());
 		panel.add(quantityText());
 
+		//enable textarea scroll
 		JScrollPane tablePane = new JScrollPane(descriptionText());
 		tablePane.setBounds(193, 100, 245, 55);
-		//tablePane.setOpaque(false);	//设置装表格的视图透明
-		///tablePane.getViewport().setOpaque(false);//视图透明
-		tablePane.setBorder(null);//设置边框
+		tablePane.setBorder(null);//set border
 		panel.add(tablePane);
+
+		panel.add(idText());
+		panel.add(primarykeyText());
+
 
 		panel.add(userButton());//向容器中添加按钮组件
 		panel.add(passButton());
@@ -68,6 +76,7 @@ public class productPanel extends SuperPanel {
 		
 		return panel;
 	}
+
 	private JLabel nameLabel() {
 		lab1.setFont(font);
 		lab1.setBounds(50, 40, 120, 30);
@@ -97,12 +106,14 @@ public class productPanel extends SuperPanel {
 	private JTextField nameText() {
 		text1.setBounds(190, 37, 250, 35);
 		text1.setFont(font);
+
 		return text1;
 	}
 	private JTextArea descriptionText() {
 		text2.setFont(font);
 		text2.setLineWrap(true);
 		text2.setWrapStyleWord(true);
+
 		return text2;
 	}
 
@@ -119,7 +130,19 @@ public class productPanel extends SuperPanel {
 		text4.setFont(font);
 		return text4;
 	}
-	//登录按钮组件
+	
+	private JTextField idText() {
+		text5.setVisible(false);
+
+		return text5;
+	}
+	
+	private JTextField primarykeyText() {
+		text6.setVisible(false);
+
+		return text6;
+	}
+
 	private JButton userButton() {
 		but1.setBounds(100, 300, 100, 40);
 		but1.setFont(font);
@@ -141,8 +164,10 @@ public class productPanel extends SuperPanel {
 				description = descriptionText().getText();
 				price = priceText().getText();
 				quantity = quantityText().getText();
+				id = idText().getText();
+				primarykey = primarykeyText().getText();
 				//将信息传给注册信息验证类验证
-				new productCheck(frame, id, name, description, price, quantity, app);
+				new productCheck(frame, id, name, description, price, quantity, primarykey, app);
 			}
 		});
 	}
@@ -150,11 +175,26 @@ public class productPanel extends SuperPanel {
 	public void but2Click(JFrame frame) {
 		but2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				nameText().setText("");
-				descriptionText().setText("");
-				priceText().setText("");
-				quantityText().setText("");
+				reset(null);
 			}
 		});
+	}
+
+	public void reset(Product product) {
+		if (product != null) {
+			nameText().setText(product.getName());
+			descriptionText().setText(product.getDescription());
+			priceText().setText(String.valueOf(product.getPrice()));
+			quantityText().setText(String.valueOf(product.getQuantity()));
+			idText().setText(product.getId());
+			primarykeyText().setText(String.valueOf(product.getPrimarykey()));
+		} else {
+			nameText().setText("");
+			descriptionText().setText("");
+			priceText().setText("");
+			quantityText().setText("");
+			idText().setText("");
+			primarykeyText().setText("");
+		}
 	}
 }

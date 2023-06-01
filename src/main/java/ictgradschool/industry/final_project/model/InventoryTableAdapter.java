@@ -1,17 +1,25 @@
 package ictgradschool.industry.final_project.model;
 
+import ictgradschool.industry.final_project.ProjectUI;
+import ictgradschool.industry.final_project.model.worker.SaveWorker;
+import ictgradschool.industry.final_project.util.productAction;
+import ictgradschool.industry.final_project.view.product.productGUI;
+
+import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 
 public class InventoryTableAdapter extends AbstractTableModel implements ProductsListListener {
-
+    private static final long serialVersionUID = 1L;
     /**********************************************************************
      * YOUR CODE HERE
      */
-    private String[] _columnNames = {"Product ID", "Name", "Description", "Price", "Quantity"};
+    private String[] _columnNames = {"Checked?", "Product ID", "Name", "Description", "Price", "Quantity", "Action"};
     private ProductsList model;
+    private ProjectUI app;
 
-    public InventoryTableAdapter(ProductsList model) {
+    public InventoryTableAdapter(ProductsList model, ProjectUI app) {
         this.model = model;
+        this.app = app;
         model.addListener(this);
     }
 
@@ -35,18 +43,74 @@ public class InventoryTableAdapter extends AbstractTableModel implements Product
         Product product = model.get(rowIndex);
         switch (columnIndex) {
             case 0:
-                return product.getId();
+                return product.isSelected();
             case 1:
-                return product.getName();
+                return product.getId();
             case 2:
-                return product.getDescription();
+                return product.getName();
             case 3:
-                return product.getPrice();
+                return product.getDescription();
             case 4:
+                return product.getPrice();
+            case 5:
                 return product.getQuantity();
         }
         return null;
     }
+    @Override
+    public Class<?> getColumnClass(int columnIndex) {
+        if (columnIndex == 0) {
+            return Boolean.class;
+        } else if (columnIndex == 6) {
+            return Object.class;
+        } else if (columnIndex == 4) {
+            return Double.class;
+        } else if (columnIndex == 5) {
+            return Integer.class;
+        }
+        return String.class;
+    }
+    @Override
+    public boolean isCellEditable(int rowIndex, int columnIndex) {
+        // Only the first column in the table should be editable
+        return columnIndex == 0 || columnIndex == 6;
+    }
+
+    @Override
+    public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+        // How do I toggle the checked state of the cell when columnIndex == 0?
+        System.out.println("(" + rowIndex + ", " + columnIndex +
+                ") clicked. Value = " + aValue);
+        Product item = model.get(rowIndex);
+        if (columnIndex == 0) {
+            item.setSelected(Boolean.valueOf(aValue.toString()));
+            if (item.isSelected()) {
+                model.addSelect(item.getId());
+            } else {
+                model.removeSelect(item.getId());
+            }
+        }
+
+        if (columnIndex == 6) {
+            if ("edit".equals(aValue)) {
+                System.out.println("edit");
+                System.out.println("add product dialog show up");
+                productGUI productGui = new productGUI(app, item);
+            } else if ("delete".equals(aValue)) {
+                int result = JOptionPane.showConfirmDialog(null, "Are you sure?", "Confirmation", JOptionPane.YES_NO_OPTION);
+                if (result == JOptionPane.YES_OPTION) {
+                    model.addSelect(item.getId());
+                    model.batchDelete();
+                }
+                System.out.println("delete");
+            } else {
+                System.out.println("add to cart");
+            }
+        }
+        fireTableCellUpdated(rowIndex, columnIndex);
+    }
+
+
     /**
      * Called when data is added to the underlying {@link Product}. Forwards the change to the {@link JTable} using
      * the {@link #fireTableDataChanged()} method, which is implemented by {@link AbstractTableModel}.
@@ -66,11 +130,17 @@ public class InventoryTableAdapter extends AbstractTableModel implements Product
     @Override
     public void projectDataAdded(ProductsList model, String dataItem, int index) {
         fireTableDataChanged();
+        System.out.println("projectDataAdded");
+        //model.triggerSave();
     }
 
+
     @Override
-    public void projectDataRemoved(ProductsList model, String dataItem) {
+    public void projectDataRemoved(ProductsList model) {
         fireTableDataChanged();
+        System.out.println("projectDataChanged");
+        //model.triggerSave();
+
     }
 
     @Override

@@ -55,17 +55,20 @@ public class WelcomePanel extends SuperPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-
         if (e.getSource() == backButton) {
             System.out.println("back");
             this.app.tiggerBack();
         } else if (e.getSource() == inventoryButton) {
             System.out.println("inventory panel");
             this.app.createInventoryTableFrame();
+        } else if (e.getSource() == salesButton) {
+            System.out.println("sales panel");
+            this.app.createSalesTableFrame();
+
+        }
+        if (e.getSource() != backButton) {
             myWorker = new Worker();
             myWorker.execute();
-        } else if (e.getSource() == salesButton) {
-
         }
     }
 
@@ -86,7 +89,8 @@ public class WelcomePanel extends SuperPanel implements ActionListener {
             List<Product> Loaddata;
             try {
                 Loaddata = get();
-                if (Loaddata == null) {
+                if (Loaddata == null || Loaddata.isEmpty()) {
+                    System.out.println("No data loaded.");
 
                 } else {
                     // Populate the Course model object with the loaded data.

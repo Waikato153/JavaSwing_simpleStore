@@ -1,10 +1,7 @@
 package ictgradschool.industry.final_project;
 
 import ictgradschool.industry.final_project.model.ProductsList;
-import ictgradschool.industry.final_project.view.FileChooserPanel;
-import ictgradschool.industry.final_project.view.InventoryPanel;
-import ictgradschool.industry.final_project.view.SuperPanel;
-import ictgradschool.industry.final_project.view.WelcomePanel;
+import ictgradschool.industry.final_project.view.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,7 +11,7 @@ import java.io.File;
 
 public class ProjectUI {
     private ProductsList productsList = new ProductsList();
-    private JFrame chooseFileFrame;
+    private static JFrame chooseFileFrame;
     private FileChooserPanel choosePane;
     private WelcomePanel welcomePane;
 
@@ -58,7 +55,7 @@ public class ProjectUI {
         chooseFileFrame.setVisible(true);
     }
     //welcome panel
-    private void createWelcomeFrame() {
+    public void createWelcomeFrame() {
 //        welcomeFrame = new JFrame("Welcome to the Inventory Management System");
 //        welcomeFrame.setSize(500, 500);
 //        welcomeFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -77,8 +74,14 @@ public class ProjectUI {
 
     public void createInventoryTableFrame() {
         InventoryPanel inventoryPanel = new InventoryPanel(this);
-        inventoryPanel.createFrameUI();
+        inventoryPanel.createFrameUI("Inventory Management System");
     }
+
+    public void createSalesTableFrame() {
+        PointSalePanel pointSalePanel = new PointSalePanel(this);
+        pointSalePanel.createFrameUI("Point of Sale System");
+    }
+
 
     //action after choosing the filestore
     public void tiggerFileSelect(String txtFile) {

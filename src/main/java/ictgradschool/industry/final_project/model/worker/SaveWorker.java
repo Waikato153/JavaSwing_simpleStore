@@ -11,9 +11,12 @@ public class SaveWorker extends SwingWorker<Void, Void> {
     private ProductsList productsList;
     private productAction action;
 
-    public SaveWorker(ProductsList productsList, productAction action) {
+    private String pid;
+
+    public SaveWorker(ProductsList productsList, productAction action, String pid) {
         this.productsList = productsList;
         this.action = action;
+        this.pid = pid;
     }
     @Override
     protected Void doInBackground() throws Exception {
@@ -22,8 +25,8 @@ public class SaveWorker extends SwingWorker<Void, Void> {
         if (action == productAction.Edit) {
             append = false;
         }
-
-        productsList.saveFile(append);
+        productsList.saveFile(append, pid);
+        productsList.generateData();
         return null;
     }
 }
