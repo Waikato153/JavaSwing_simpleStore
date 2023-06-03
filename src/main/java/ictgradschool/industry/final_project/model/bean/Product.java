@@ -1,4 +1,4 @@
-package ictgradschool.industry.final_project.model;
+package ictgradschool.industry.final_project.model.bean;
 
 import java.io.Serializable;
 
@@ -71,7 +71,7 @@ public class Product implements Serializable {
         this.selected = selected;
     }
 
-    public Product(String id, String name, String description, double price,int quantity,int primarykey) {
+    public Product(String id, String name, String description, double price, int quantity, int primarykey) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -102,9 +102,4 @@ public class Product implements Serializable {
     public String toString() {
         return getId() + " " + getName() + " " + getDescription() + " " + getPrice() + " " + getQuantity() + " " + getPrimarykey();
     }
-
-
-
-
-
 }

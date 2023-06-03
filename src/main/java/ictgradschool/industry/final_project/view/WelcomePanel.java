@@ -1,14 +1,14 @@
 package ictgradschool.industry.final_project.view;
 
 import ictgradschool.industry.final_project.ProjectUI;
-import ictgradschool.industry.final_project.model.Product;
 import ictgradschool.industry.final_project.model.ProductsList;
+import ictgradschool.industry.final_project.model.bean.Product;
+import ictgradschool.industry.final_project.model.worker.LoadDataWorker;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -17,8 +17,7 @@ import java.util.concurrent.ExecutionException;
 public class WelcomePanel extends SuperPanel implements ActionListener {
     // open welcome interface
     JButton backButton, inventoryButton, salesButton;
-
-    SwingWorker myWorker;
+    SwingWorker myWorker = null;
 
     public WelcomePanel(ProjectUI app) {
         super(app);
@@ -55,6 +54,7 @@ public class WelcomePanel extends SuperPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        Boolean needZero = true;
         if (e.getSource() == backButton) {
             System.out.println("back");
             this.app.tiggerBack();
@@ -64,52 +64,11 @@ public class WelcomePanel extends SuperPanel implements ActionListener {
         } else if (e.getSource() == salesButton) {
             System.out.println("sales panel");
             this.app.createSalesTableFrame();
-
+            needZero = false;
         }
-        if (e.getSource() != backButton) {
-            myWorker = new Worker();
+        if (e.getSource() != backButton && myWorker == null) {
+            myWorker = new LoadDataWorker(needZero, app);
             myWorker.execute();
-        }
-    }
-
-    /*
-     * Nested inner class to load Course data from file using a separate thread.
-     */
-    private class Worker extends SwingWorker<List<Product>, Void> {
-
-        @Override
-        protected List<Product> doInBackground() {
-            System.out.println("Loading data...");
-            return ProductsList.readData();
-        }
-
-        @Override
-        protected void done() {
-            System.out.println("Done.");
-            List<Product> Loaddata;
-            try {
-                Loaddata = get();
-                if (Loaddata == null || Loaddata.isEmpty()) {
-                    System.out.println("No data loaded.");
-
-                } else {
-                    // Populate the Course model object with the loaded data.
-                    Iterator<Product> iterator = Loaddata.iterator();
-
-                    while (iterator.hasNext()) {
-                        Product product = iterator.next();
-                        System.out.println(product);
-                        app.getProductsList().add(product);
-                    }
-
-//                    for (Product result : Loaddata) {
-//                        System.out.println("Loaded " + Loaddata.size() + " products.");
-//                        app.getProductsList().add(result);
-//                    }
-                }
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
         }
     }
 }

@@ -1,6 +1,8 @@
 package ictgradschool.industry.final_project;
 
+import ictgradschool.industry.final_project.model.ProductsCartList;
 import ictgradschool.industry.final_project.model.ProductsList;
+import ictgradschool.industry.final_project.model.ShoppingCartList;
 import ictgradschool.industry.final_project.view.*;
 
 import javax.swing.*;
@@ -11,6 +13,8 @@ import java.io.File;
 
 public class ProjectUI {
     private ProductsList productsList = new ProductsList();
+    private ProductsCartList productsCartList = new ProductsCartList();
+    private ShoppingCartList shoppingCartList = new ShoppingCartList();
     private static JFrame chooseFileFrame;
     private FileChooserPanel choosePane;
     private WelcomePanel welcomePane;
@@ -78,6 +82,7 @@ public class ProjectUI {
     }
 
     public void createSalesTableFrame() {
+
         PointSalePanel pointSalePanel = new PointSalePanel(this);
         pointSalePanel.createFrameUI("Point of Sale System");
     }
@@ -92,11 +97,18 @@ public class ProjectUI {
     public ProductsList getProductsList() {
         return productsList;
     }
+
+    public ProductsCartList getProductsCartList() {
+        return productsCartList;
+    }
+
+    public ShoppingCartList getShoppingCartList() {
+        return shoppingCartList;
+    }
     //action after click back
     public void tiggerBack() {
         createChooseFileFrame();
     }
-
 
     public void saveCsv() {
         //load data to .dat file

@@ -2,10 +2,9 @@ package ictgradschool.industry.final_project.view.product;
 
 import ictgradschool.industry.final_project.ProjectUI;
 import ictgradschool.industry.final_project.control.productCheck;
-import ictgradschool.industry.final_project.model.Product;
+import ictgradschool.industry.final_project.model.bean.Product;
 import ictgradschool.industry.final_project.view.SuperPanel;
 
-import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 

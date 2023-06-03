@@ -1,8 +1,8 @@
 package ictgradschool.industry.final_project.model;
 
 import ictgradschool.industry.final_project.ProjectUI;
-import ictgradschool.industry.final_project.model.worker.SaveWorker;
-import ictgradschool.industry.final_project.util.productAction;
+import ictgradschool.industry.final_project.model.bean.Product;
+import ictgradschool.industry.final_project.model.bean.ShoppingItem;
 import ictgradschool.industry.final_project.view.product.productGUI;
 
 import javax.swing.*;
@@ -16,6 +16,7 @@ public class InventoryTableAdapter extends AbstractTableModel implements Product
     private String[] _columnNames = {"Checked?", "Product ID", "Name", "Description", "Price", "Quantity", "Action"};
     private ProductsList model;
     private ProjectUI app;
+
 
     public InventoryTableAdapter(ProductsList model, ProjectUI app) {
         this.model = model;
@@ -34,13 +35,16 @@ public class InventoryTableAdapter extends AbstractTableModel implements Product
         return _columnNames.length;
     }
 
+
     @Override
     public String getColumnName(int column) {
         return _columnNames[column];
     }
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
+
         Product product = model.get(rowIndex);
+
         switch (columnIndex) {
             case 0:
                 return product.isSelected();
@@ -101,10 +105,17 @@ public class InventoryTableAdapter extends AbstractTableModel implements Product
                 if (result == JOptionPane.YES_OPTION) {
                     model.addSelect(item.getId());
                     model.batchDelete();
+                    model.triggerSave();
                 }
                 System.out.println("delete");
             } else {
-                System.out.println("add to cart");
+                item.setQuantity(item.getQuantity() - 1);
+                ShoppingItem shoppingItem = new ShoppingItem(item.getId(), 1, item);
+                app.getShoppingCartList().addShoppingCartResult(shoppingItem);
+                if (item.getQuantity() <= 0) {
+                    model.addSelect(item.getId());
+                    model.batchDelete();
+                }
             }
         }
         fireTableCellUpdated(rowIndex, columnIndex);

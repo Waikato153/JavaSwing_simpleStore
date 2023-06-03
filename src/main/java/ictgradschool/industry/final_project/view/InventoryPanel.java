@@ -19,7 +19,7 @@ import java.util.EventObject;
 import java.util.HashMap;
 import java.util.Map;
 
-public class InventoryPanel extends ProductPanel{
+public class InventoryPanel extends ProductPanel {
 
     private JTextField filterText;
 
@@ -37,18 +37,13 @@ public class InventoryPanel extends ProductPanel{
 
     @Override
     public void getBottom() {
-
-        JPanel searchPanel = new JPanel();
-        JLabel searchLabel = new JLabel("Search", SwingConstants.TRAILING);
-        // Set the font color
-        searchLabel.setForeground(Color.red);
-        searchPanel.setFont(new Font("Arial", Font.BOLD, 50));
-        searchPanel.add(searchLabel);
-
-        add(searchPanel, BorderLayout.SOUTH);
         //Create a separate form for filterText and statusText
 
         JPanel form = new JPanel(new SpringLayout());
+
+        form.setBorder(BorderFactory.createTitledBorder("Search"));
+
+
         JLabel l1 = new JLabel("Identifier:", SwingConstants.TRAILING);
         form.add(l1);
         filterText = new JTextField();
@@ -158,6 +153,31 @@ public class InventoryPanel extends ProductPanel{
             return;
         }
         sorter.setRowFilter(rf);
+    }
+
+    @Override
+    public void createFrameUI(String title) {
+        inventoryFrame = new JFrame(title);
+        inventoryFrame.setContentPane(this);
+        //add menu bar
+        JMenuBar mb = getMenuBar();
+        if (mb != null) {
+            inventoryFrame.setJMenuBar(mb);
+        }
+
+        // Add a WindowListener to the JFrame
+        inventoryFrame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                System.out.println("Inventory or sales Window Closed");
+                app.getProductsList().clearSelectedIds();
+            }
+        });
+
+        inventoryFrame.pack();
+        inventoryFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        inventoryFrame.setLocationRelativeTo(null);
+        inventoryFrame.setVisible(true);
     }
 
     @Override

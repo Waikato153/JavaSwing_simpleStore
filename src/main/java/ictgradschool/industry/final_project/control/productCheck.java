@@ -1,16 +1,12 @@
 package ictgradschool.industry.final_project.control;
 
 import ictgradschool.industry.final_project.ProjectUI;
-import ictgradschool.industry.final_project.model.Product;
 import ictgradschool.industry.final_project.model.ProductsList;
-import ictgradschool.industry.final_project.util.GUITools;
+import ictgradschool.industry.final_project.model.bean.Product;
 import ictgradschool.industry.final_project.util.UniqueIdentifierGenerator;
 import ictgradschool.industry.final_project.util.productAction;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import javax.swing.*;
 
 

@@ -1,7 +1,7 @@
 package ictgradschool.industry.final_project.view.product;
 
 import ictgradschool.industry.final_project.ProjectUI;
-import ictgradschool.industry.final_project.model.Product;
+import ictgradschool.industry.final_project.model.bean.Product;
 import ictgradschool.industry.final_project.util.GUITools;
 
 import javax.swing.*;
@@ -27,6 +27,7 @@ public class productGUI {
 		this.product = product;
 		this.run();
 	}
+
 
 	public void run() {
 		// Add a WindowListener to the JFrame

@@ -1,13 +1,11 @@
 package ictgradschool.industry.final_project.model;
 
 import ictgradschool.industry.final_project.admin.ProductResultBuilder;
+import ictgradschool.industry.final_project.model.bean.Product;
 import ictgradschool.industry.final_project.model.worker.SaveWorker;
 import ictgradschool.industry.final_project.util.productAction;
 
 import java.io.*;
-import java.net.URL;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class ProductsList {
@@ -18,16 +16,17 @@ public class ProductsList {
     private static String INPUT_FILE_NAME = "";
 
     //private static List<Product> products;
-    private static HashMap<String, Product> products;
+    protected static HashMap<String, Product> products;
 
     /*
      * An indexed collection of the Product objects stored in the results
      * hashtable. This essentially provides an index offering direct access to
      * any StudentResult object stored.
      */
-    private List<Product> _indexedResults;
-    private static List<String> productIds = new ArrayList<>();
-    private Set<ProductsListListener> listeners ;
+    protected List<Product> _indexedResults;
+    protected List<Product> _cartResults;
+    protected static List<String> productIds = new ArrayList<>();
+    protected Set<ProductsListListener> listeners ;
 
     private HashSet<String> _selectedIds = new HashSet<>();
 
@@ -36,6 +35,7 @@ public class ProductsList {
         products = new HashMap<String, Product>();
         listeners = new HashSet<>();
         _indexedResults = new ArrayList<>();
+        _cartResults = new ArrayList<>();
     }
 
     public void add(Product product) {
@@ -43,6 +43,7 @@ public class ProductsList {
         productIds.add(product.getId());
         _indexedResults = new ArrayList<>(products.values());
         Collections.sort(_indexedResults, (a, b) -> Integer.valueOf(b.getPrimarykey()).compareTo(Integer.valueOf(a.getPrimarykey())));
+
         for(ProductsListListener listener : listeners) {
             listener.projectDataAdded(this , product.getId(), size()-1);
         }
@@ -67,7 +68,6 @@ public class ProductsList {
             l.projectDataRemoved(this);
         }
         clearSelectedIds();
-        triggerSave();
     }
 
     public void addSelect(String id) {
@@ -168,7 +168,7 @@ public class ProductsList {
     /**
      * Attempts to deserialise a List of ProjectResult objects from disk.
      */
-    public static List<Product> readData() {
+    public static List<Product> readData(boolean needZero) {
         List<Product> csvProducts = new ArrayList<>();
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(DATA_FILE_NAME))) {
             // Read the number of entries the stream contains
@@ -177,7 +177,9 @@ public class ProductsList {
             // Attempt to read each object from the stream
             for (int i = 0; i < count; i++) {
                 Product p = (Product) ois.readObject();
-                csvProducts.add(p);
+                if (needZero == false && p.getQuantity() > 0) {
+                    csvProducts.add(p);
+                }
             }
             ois.close();
             System.out.println("Read " + products.size() + " products records.");

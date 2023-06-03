@@ -1,34 +1,93 @@
 package ictgradschool.industry.final_project.view;
 
-
 import ictgradschool.industry.final_project.ProjectUI;
 import ictgradschool.industry.final_project.model.InventoryTableAdapter;
-import ictgradschool.industry.final_project.util.SpringUtilities;
-import ictgradschool.industry.final_project.view.product.productGUI;
+import ictgradschool.industry.final_project.model.ProductsCartList;
+import ictgradschool.industry.final_project.model.ShoppingCartListAdapter;
+import ictgradschool.industry.final_project.view.sales.CheckoutPanel;
+import ictgradschool.industry.final_project.view.sales.CheckoutPanelAdapter;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.EventObject;
 import java.util.HashMap;
-import java.util.Map;
 
 public class PointSalePanel extends ProductPanel{
+    private ShoppingCartListAdapter _cartModel;
+
+    private CheckoutPanel checkoutPanel;
+
+    private JTable tableCartView;
+
 
     public PointSalePanel(ProjectUI app) {
         super(app);
+        _cartModel = new ShoppingCartListAdapter(app.getShoppingCartList(), app);
     }
 
     @Override
     public void getBottom() {
 
     }
+    @Override
+    public void createFrameUI(String title) {
+        inventoryFrame = new JFrame(title);
+
+        //add menu bar
+        JMenuBar mb = getMenuBar();
+        if (mb != null) {
+            inventoryFrame.setJMenuBar(mb);
+        }
+        tableCartView = new JTable(_cartModel);
+
+        HashMap<String, String> map = new HashMap<>();
+        map.put("delete", "Delete");
+
+        AcceptRejectRenderer renderer = new AcceptRejectRenderer(map);
+        tableCartView.getColumnModel().getColumn(4).setCellRenderer(renderer);
+        tableCartView.getColumnModel().getColumn(4).setCellEditor(new AcceptRejectEditor(map));
+        tableCartView.setRowHeight(renderer.getTableCellRendererComponent(tableView, null, true, true, 0, 0).getPreferredSize().height);
+
+
+        JPanel right = new JPanel();
+        right.setLayout(new BoxLayout(right, BoxLayout.Y_AXIS));
+
+        JScrollPane scrollPane = new JScrollPane(tableCartView);
+        scrollPane.setBorder(BorderFactory.createTitledBorder("Shopping Cart List"));
+        right.add(scrollPane);
+        right.add(Box.createRigidArea(new Dimension(10, 0)));
+
+        checkoutPanel = new CheckoutPanel();
+
+        CheckoutPanelAdapter checkoutPanelAdapter = new CheckoutPanelAdapter(checkoutPanel, app.getShoppingCartList());
+
+        right.add(checkoutPanel);
+
+        /* Create main pxane for the application. */
+        JPanel mainPane = new JPanel();
+        mainPane.setLayout(new BoxLayout(mainPane, BoxLayout.X_AXIS));
+        mainPane.add(this);
+        mainPane.add(Box.createRigidArea(new Dimension(10, 0)));
+        mainPane.add(right);
+        inventoryFrame.add(mainPane);
+        // Add a WindowListener to the JFrame
+        inventoryFrame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                System.out.println("Inventory or sales Window Closed");
+                app.getProductsList().clearSelectedIds();
+            }
+        });
+
+        inventoryFrame.pack();
+        inventoryFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        inventoryFrame.setLocationRelativeTo(null);
+        inventoryFrame.setVisible(true);
+    }
+
 
     @Override
     public JMenuBar getMenuBar() {
@@ -61,12 +120,16 @@ public class PointSalePanel extends ProductPanel{
 
     @Override
     public void getTable() {
-        tableModel = new InventoryTableAdapter(app.getProductsList(), app);
+        tableModel = new InventoryTableAdapter(app.getProductsCartList(), app);
         tableView = new JTable(tableModel);
 
-        AcceptRejectRenderer renderer = new AcceptRejectRenderer();
+        HashMap<String, String> map = new HashMap<>();
+        map.put("add", "Add to Cart");
+
+        AcceptRejectRenderer renderer = new AcceptRejectRenderer(map);
         tableView.getColumnModel().getColumn(6).setCellRenderer(renderer);
-        tableView.getColumnModel().getColumn(6).setCellEditor(new AcceptRejectEditor());
+        tableView.getColumnModel().getColumn(6).setCellEditor(new AcceptRejectEditor(map));
+
         tableView.setRowHeight(renderer.getTableCellRendererComponent(tableView, null, true, true, 0, 0).getPreferredSize().height);
         tableView.getColumnModel().getColumn(6).setPreferredWidth(150);
         tableView.changeSelection(0, 0, false, false);
@@ -79,11 +142,8 @@ public class PointSalePanel extends ProductPanel{
         private JButton accept;
         private String state;
 
-        public AcceptRejectPane() {
+        public AcceptRejectPane(HashMap<String, String> map) {
             setLayout(new GridBagLayout());
-            accept = new JButton("Add to Cart");
-            accept.setActionCommand("add");
-            add(accept);
             ActionListener listener = new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -92,7 +152,12 @@ public class PointSalePanel extends ProductPanel{
                 }
             };
 
-            accept.addActionListener(listener);
+            for (String key : map.keySet()) {
+                accept = new JButton(map.get(key));
+                accept.setActionCommand(key);
+                add(accept);
+                accept.addActionListener(listener);
+            }
         }
 
         public void addActionListener(ActionListener listener) {
@@ -108,8 +173,8 @@ public class PointSalePanel extends ProductPanel{
 
         private AcceptRejectPane acceptRejectPane;
 
-        public AcceptRejectRenderer() {
-            acceptRejectPane = new AcceptRejectPane();
+        public AcceptRejectRenderer(HashMap<String, String> map) {
+            acceptRejectPane = new AcceptRejectPane(map);
         }
 
         @Override
@@ -127,8 +192,8 @@ public class PointSalePanel extends ProductPanel{
 
         private AcceptRejectPane acceptRejectPane;
 
-        public AcceptRejectEditor() {
-            acceptRejectPane = new AcceptRejectPane();
+        public AcceptRejectEditor(HashMap<String, String> map) {
+            acceptRejectPane = new AcceptRejectPane(map);
             acceptRejectPane.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {

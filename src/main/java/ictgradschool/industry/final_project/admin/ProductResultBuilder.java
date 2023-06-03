@@ -1,7 +1,7 @@
 package ictgradschool.industry.final_project.admin;
 
 
-import ictgradschool.industry.final_project.model.Product;
+import ictgradschool.industry.final_project.model.bean.Product;
 
 /**
  * <p>Simple Builder pattern implementation to create a ProductResult object from a series of values.</p>
