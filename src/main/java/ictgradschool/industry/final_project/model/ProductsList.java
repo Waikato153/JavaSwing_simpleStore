@@ -2,6 +2,7 @@ package ictgradschool.industry.final_project.model;
 
 import ictgradschool.industry.final_project.admin.ProductResultBuilder;
 import ictgradschool.industry.final_project.model.bean.Product;
+import ictgradschool.industry.final_project.model.bean.ShoppingItem;
 import ictgradschool.industry.final_project.model.worker.SaveWorker;
 import ictgradschool.industry.final_project.util.productAction;
 
@@ -45,9 +46,16 @@ public class ProductsList {
         Collections.sort(_indexedResults, (a, b) -> Integer.valueOf(b.getPrimarykey()).compareTo(Integer.valueOf(a.getPrimarykey())));
 
         for(ProductsListListener listener : listeners) {
-            listener.projectDataAdded(this , product.getId(), size()-1);
+            listener.projectDataAdded(this);
         }
+    }
 
+    public void clear() {
+        products.clear();
+        productIds.clear();
+        //_indexedResults.clear();
+        //_cartResults.clear();
+        //listeners.clear();
     }
 
     public void batchDelete() {
@@ -55,20 +63,47 @@ public class ProductsList {
             products.remove(element);
             productIds.remove(element);
         }
-
-        Iterator<Product> iterator = _indexedResults.iterator();
-        while (iterator.hasNext()) {
-            Product product = iterator.next();
-            if (_selectedIds.contains(product.getId())) {
-                iterator.remove();
+        if (_selectedIds.size() > 0) {
+            Iterator<Product> iterator = _indexedResults.iterator();
+            while (iterator.hasNext()) {
+                Product product = iterator.next();
+                if (_selectedIds.contains(product.getId())) {
+                    iterator.remove();
+                }
             }
+            clearSelectedIds();
         }
 
         for (ProductsListListener l : listeners) {
             l.projectDataRemoved(this);
         }
-        clearSelectedIds();
     }
+    public void batchAddCart(ShoppingCartList shoppingCartList) {
+
+        this.getSelectedIds().forEach(id -> {
+            Product item = this.getProductById(id);
+            item.setQuantity(item.getQuantity() - 1);
+            ShoppingItem shoppingItem = new ShoppingItem(id, 1, item);
+
+            Iterator<Product> iterator = _indexedResults.iterator();
+            if (item.getQuantity() <= 0) {
+                products.remove(id);
+                productIds.remove(id);
+                while (iterator.hasNext()) {
+                    Product product = iterator.next();
+                    if (id.equals(product.getId())) {
+                        iterator.remove();
+                    }
+                }
+                removeSelect(id);
+            }
+            for (ProductsListListener l : listeners) {
+                l.projectDataRemoved(this);
+            }
+            shoppingCartList.addShoppingCartResult(shoppingItem);
+        });
+    }
+
 
     public void addSelect(String id) {
         _selectedIds.add(id);
@@ -81,10 +116,14 @@ public class ProductsList {
     public HashSet<String> getSelectedIds() {
         return _selectedIds;
     }
+    public Product getProductById(String id) {
+        return products.get(id);
+    }
 
     public void clearSelectedIds() {
         _selectedIds.clear();
     }
+
 
 
     public void addListener(ProductsListListener listener) {
@@ -110,6 +149,10 @@ public class ProductsList {
 
     public void setTxtFile(String txtFile) {
         this.INPUT_FILE_NAME = txtFile;
+    }
+
+    public String getTxtFile() {
+        return INPUT_FILE_NAME;
     }
 
     public static List<String> getProductIds() {
@@ -174,15 +217,17 @@ public class ProductsList {
             // Read the number of entries the stream contains
             int count = ois.readInt();
 
+
             // Attempt to read each object from the stream
             for (int i = 0; i < count; i++) {
                 Product p = (Product) ois.readObject();
-                if (needZero == false && p.getQuantity() > 0) {
-                    csvProducts.add(p);
+                if (needZero == false && p.getQuantity() == 0) {
+                    continue;
                 }
+                csvProducts.add(p);
             }
+            System.out.println("Reading " + csvProducts.size() + " products records.");
             ois.close();
-            System.out.println("Read " + products.size() + " products records.");
         } catch (IOException e) {
             /*
              * An IOException will be thrown if an error is encountered when
@@ -206,7 +251,9 @@ public class ProductsList {
         } else {
             data = this.products;
         }
-
+        writeFile(data, append);
+    }
+    private void writeFile(Map<String, Product> data, Boolean append) {
         try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(INPUT_FILE_NAME, append))) {
             if (data.size() == 0) {
                 out.write("".getBytes());
@@ -235,5 +282,20 @@ public class ProductsList {
     public void triggerSave() {
         SaveWorker saveWorker = new SaveWorker(this, productAction.Edit,null);
         saveWorker.execute();
+    }
+    public void updateFile(ShoppingCartList shoppingCartList) {
+        List<Product> allProduct = readData(true);
+        for (Product product : allProduct) {
+            for (int i = 0; i < shoppingCartList.size(); i++) {
+                if (product.getId().equals(shoppingCartList.getResultAt(i).getProductId())) {
+                    product.setQuantity(product.getQuantity() - shoppingCartList.getResultAt(i).getQuantity());
+                }
+            }
+        }
+        HashMap<String, Product> hashMap = new HashMap<>();
+        for (int i = 0; i < allProduct.size(); i++) {
+            hashMap.put(allProduct.get(i).getId(), allProduct.get(i));
+        }
+        writeFile(hashMap, false);
     }
 }

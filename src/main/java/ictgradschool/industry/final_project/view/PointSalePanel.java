@@ -4,6 +4,8 @@ import ictgradschool.industry.final_project.ProjectUI;
 import ictgradschool.industry.final_project.model.InventoryTableAdapter;
 import ictgradschool.industry.final_project.model.ProductsCartList;
 import ictgradschool.industry.final_project.model.ShoppingCartListAdapter;
+import ictgradschool.industry.final_project.model.bean.Product;
+import ictgradschool.industry.final_project.model.bean.ShoppingItem;
 import ictgradschool.industry.final_project.view.sales.CheckoutPanel;
 import ictgradschool.industry.final_project.view.sales.CheckoutPanelAdapter;
 
@@ -12,6 +14,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.EventObject;
 import java.util.HashMap;
 
@@ -60,10 +64,12 @@ public class PointSalePanel extends ProductPanel{
         right.add(scrollPane);
         right.add(Box.createRigidArea(new Dimension(10, 0)));
 
-        checkoutPanel = new CheckoutPanel();
+        checkoutPanel = new CheckoutPanel(app);
+
+
+
 
         CheckoutPanelAdapter checkoutPanelAdapter = new CheckoutPanelAdapter(checkoutPanel, app.getShoppingCartList());
-
         right.add(checkoutPanel);
 
         /* Create main pxane for the application. */
@@ -97,7 +103,7 @@ public class PointSalePanel extends ProductPanel{
         menuadd.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-
+                app.getProductsCartList().batchAddCart(app.getShoppingCartList());
             }
         });
 

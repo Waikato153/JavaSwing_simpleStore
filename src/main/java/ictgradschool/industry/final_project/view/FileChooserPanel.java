@@ -77,8 +77,6 @@ public class FileChooserPanel extends SuperPanel implements ActionListener {
         }
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fc.getSelectedFile();
-
-
             if (selectedFile.exists()) {
                 // File exists, perform operations on existing file
                 System.out.println("Selected file: " + selectedFile.getAbsolutePath());
@@ -96,7 +94,6 @@ public class FileChooserPanel extends SuperPanel implements ActionListener {
             }
             try {
                 this.app.tiggerFileSelect(selectedFile.getCanonicalPath());
-
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }

@@ -66,7 +66,7 @@ public class WelcomePanel extends SuperPanel implements ActionListener {
             this.app.createSalesTableFrame();
             needZero = false;
         }
-        if (e.getSource() != backButton && myWorker == null) {
+        if (e.getSource() != backButton) {
             myWorker = new LoadDataWorker(needZero, app);
             myWorker.execute();
         }

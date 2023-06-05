@@ -1,7 +1,7 @@
 package ictgradschool.industry.final_project.model;
 
 public interface ProductsListListener {
-    void projectDataAdded(ProductsList model, String dataItem, int index);
+    void projectDataAdded(ProductsList model);
 
     void projectDataRemoved(ProductsList model);
 

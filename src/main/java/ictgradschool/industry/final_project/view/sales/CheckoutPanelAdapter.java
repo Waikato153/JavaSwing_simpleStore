@@ -16,10 +16,13 @@ public class CheckoutPanelAdapter extends JPanel implements ShoppingCartObserver
         this.checkoutPanel = checkoutPanel;
         this.shoppingCartList = shoppingCartList;
         shoppingCartList.addObserver(this);
+        // first calculate
+        this.update();
     }
 
     @Override
     public void update() {
         checkoutPanel.update(shoppingCartList.getTotalPrice());
     }
+
 }

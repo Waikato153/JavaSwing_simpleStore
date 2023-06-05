@@ -8,7 +8,7 @@ import ictgradschool.industry.final_project.view.product.productGUI;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 
-public class InventoryTableAdapter extends AbstractTableModel implements ProductsListListener {
+public class InventoryTableAdapter extends AbstractTableModel implements ProductsListListener, ShoppingCartListener {
     private static final long serialVersionUID = 1L;
     /**********************************************************************
      * YOUR CODE HERE
@@ -109,13 +109,16 @@ public class InventoryTableAdapter extends AbstractTableModel implements Product
                 }
                 System.out.println("delete");
             } else {
-                item.setQuantity(item.getQuantity() - 1);
                 ShoppingItem shoppingItem = new ShoppingItem(item.getId(), 1, item);
                 app.getShoppingCartList().addShoppingCartResult(shoppingItem);
+                item.setQuantity(item.getQuantity() - 1);
+
                 if (item.getQuantity() <= 0) {
                     model.addSelect(item.getId());
                     model.batchDelete();
                 }
+                //update the quantity in the products
+                System.out.println(app.getProductsList().products);
             }
         }
         fireTableCellUpdated(rowIndex, columnIndex);
@@ -139,9 +142,8 @@ public class InventoryTableAdapter extends AbstractTableModel implements Product
      */
 
     @Override
-    public void projectDataAdded(ProductsList model, String dataItem, int index) {
+    public void projectDataAdded(ProductsList model) {
         fireTableDataChanged();
-        System.out.println("projectDataAdded");
         //model.triggerSave();
     }
 
@@ -156,6 +158,12 @@ public class InventoryTableAdapter extends AbstractTableModel implements Product
 
     @Override
     public void projectDataChanged(ProductsList model, int index, String oldValue, String newValue) {
+        fireTableDataChanged();
+    }
+
+    @Override
+    public void CartDataChanged(ShoppingCartList model) {
+
         fireTableDataChanged();
     }
 }

@@ -2,6 +2,7 @@ package ictgradschool.industry.final_project.model;
 
 import ictgradschool.industry.final_project.model.bean.ShoppingItem;
 
+import java.io.*;
 import java.util.*;
 
 /**
@@ -27,7 +28,6 @@ public class ShoppingCartList {
         _indexedResults = new ArrayList<ShoppingItem>();
         _listeners = new HashSet<>();
     }
-
     /**
      * Adds a new ShoppingItem object to the model.
      *
@@ -50,6 +50,7 @@ public class ShoppingCartList {
         }
     }
     public void removeShoppingItem (int index) {
+        ShoppingItem item = _indexedResults.get(index);
         _indexedResults.remove(index);
         for(ShoppingCartListener listener : _listeners) {
             listener.CartDataChanged(this);
@@ -92,7 +93,6 @@ public class ShoppingCartList {
     public Iterator<ShoppingItem> iterator() {
         return _indexedResults.iterator();
     }
-
     /**
      * Returns the number of ShoppingItem objects stored in the model.
      */
@@ -100,31 +100,86 @@ public class ShoppingCartList {
         return _indexedResults.size();
     }
 
-    public double getTotalPrice() {
+
+    public void clear() {
+        _indexedResults.clear();
+        for(ShoppingCartListener listener : _listeners) {
+            listener.CartDataChanged(this);
+        }
+    }
+
+    public double  getTotalPrice() {
         double total = 0;
         for (ShoppingItem item : _indexedResults) {
             total += item.getProduct().getPrice() * item.getQuantity();
         }
         return Double.valueOf(String.format("%.2f", total));
     }
-
-
     public void addListener(ShoppingCartListener listener) {
         _listeners.add(listener);
     }
-
     public Set getListeners() {
         return _listeners;
     }
     public void removeListener(ShoppingCartListener listener) {
         _listeners.remove(listener);
     }
-
     public void addObserver(ShoppingCartObserver observer) {
         _observers.add(observer);
     }
-
     public Set<ShoppingCartObserver> listObserver() {
         return _observers;
     }
+
+    public void writeFile(String fileName) {
+        String receiptContent = generateReceipt();
+        try (FileWriter writer = new FileWriter(fileName)) {
+            writer.write(receiptContent);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String generateReceipt() {
+        StringBuilder receiptBuilder = new StringBuilder();
+
+        receiptBuilder.append("------------------------------------------------------\n");
+
+        for (ShoppingItem product : _indexedResults) {
+            List<String> wrappedLines = wrapText(product.getProduct().getName(), 40);
+            for (int i = 0; i < wrappedLines.size(); i++) {
+                if (i == 0) {
+                    receiptBuilder.append(String.format("%-5d  %-20s  ($%-2s)  %-2s  $%-2s%n", product.getQuantity(), wrappedLines.get(i), product.getProduct().getPrice(),"", product.getProduct().getPrice() * product.getQuantity()));
+                } else {
+                    receiptBuilder.append(String.format("%-5s  %-20s%n", "", wrappedLines.get(i)));
+                }
+            }
+        }
+
+        receiptBuilder.append("======================================================\n");
+
+        receiptBuilder.append(String.format("%-5s  %-20s  %-6s %-4s  $%-2s", "", "TOTAL", "", "",getTotalPrice()));
+
+        return receiptBuilder.toString();
+    }
+    private static List<String> wrapText(String text, int lineLength) {
+        List<String> wrappedLines = new ArrayList<>();
+        String[] words = text.split(" ");
+        StringBuilder currentLine = new StringBuilder();
+
+        for (String word : words) {
+            if (currentLine.length() + word.length() <= lineLength) {
+                currentLine.append(word).append(" ");
+            } else {
+                wrappedLines.add(currentLine.toString());
+                currentLine = new StringBuilder(word).append(" ");
+            }
+        }
+
+        if (currentLine.length() > 0) {
+            wrappedLines.add(currentLine.toString());
+        }
+        return wrappedLines;
+    }
+
 }
