@@ -68,7 +68,6 @@ public class PointSalePanel extends ProductPanel{
 
 
 
-
         CheckoutPanelAdapter checkoutPanelAdapter = new CheckoutPanelAdapter(checkoutPanel, app.getShoppingCartList());
         right.add(checkoutPanel);
 
@@ -103,7 +102,11 @@ public class PointSalePanel extends ProductPanel{
         menuadd.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                app.getProductsCartList().batchAddCart(app.getShoppingCartList());
+           if (app.getProductsCartList().getSelectedIds().size() == 0) {
+               JOptionPane.showMessageDialog(null, "No product is added to cart!", "Warning", JOptionPane.YES_OPTION);
+           } else {
+               app.getProductsCartList().batchAddCart(app.getShoppingCartList());
+           }
             }
         });
 
