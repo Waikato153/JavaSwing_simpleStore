@@ -201,7 +201,11 @@ public class InventoryPanel extends ProductPanel {
                 if (app.getProductsList().getSelectedIds().size() == 0) {
                     JOptionPane.showMessageDialog(null, "Please select a product to delete.", "Error", JOptionPane.ERROR_MESSAGE);
                 } else {
-                    app.getProductsList().batchDelete();
+                    int result = JOptionPane.showConfirmDialog(null, "Are you sure?", "Confirmation", JOptionPane.YES_NO_OPTION);
+                    if (result == JOptionPane.YES_OPTION) {
+                        app.getProductsList().batchDelete();
+                        app.getProductsList().triggerSave();
+                    }
                 }
             }
         });

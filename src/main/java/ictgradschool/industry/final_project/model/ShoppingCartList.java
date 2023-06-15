@@ -149,7 +149,7 @@ public class ShoppingCartList {
             List<String> wrappedLines = wrapText(product.getProduct().getName(), 15);
             for (int i = 0; i < wrappedLines.size(); i++) {
                 if (i == 0) {
-                    receiptBuilder.append(String.format("%-5d  %-20s  ($%-2s)  %-2s  $%-2s%n", product.getQuantity(), wrappedLines.get(i), product.getProduct().getPrice(),"", product.getProduct().getPrice() * product.getQuantity()));
+                    receiptBuilder.append(String.format("%-5s  %-20s  ($%-2s)  %-2s  $%-2s%n", String.valueOf(product.getQuantity()), wrappedLines.get(i), product.getProduct().getPrice(),"", product.getProduct().getPrice() * product.getQuantity()));
                 } else {
                     receiptBuilder.append(String.format("%-5s  %-20s%n", "", wrappedLines.get(i)));
                 }
