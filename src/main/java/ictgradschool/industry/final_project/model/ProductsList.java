@@ -1,5 +1,8 @@
 package ictgradschool.industry.final_project.model;
 
+import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
+import com.opencsv.exceptions.CsvValidationException;
 import ictgradschool.industry.final_project.admin.ProductResultBuilder;
 import ictgradschool.industry.final_project.model.bean.Product;
 import ictgradschool.industry.final_project.model.bean.ShoppingItem;
@@ -165,34 +168,22 @@ public class ProductsList {
     public static void generateData() {
         List<Product> results = new ArrayList<>();
         // Open the input CSV file for processing
-        try (Scanner sc = new Scanner(new File(ProductsList.INPUT_FILE_NAME))) {
 
-            sc.useDelimiter(",|\n|\r\n");
-
-            // Create a builder instance to assist with creating StudentResult objects from a stream of data
-            ProductResultBuilder srb = new ProductResultBuilder();
-
-            // Read each CSV row
-            while (sc.hasNext()) {
-                String id = sc.next();
-                if (id.isBlank() || id.isEmpty()) {
-                    break;
-                }
-
-                // Use a Builder pattern to generate a StudentResult object from data as it is read
-                results.add(
-                        srb.id(id)
-                                .name(sc.next())
-                                .description(sc.next())
-                                .price(sc.nextDouble())
-                                .quantity(sc.nextInt())
-                                .primarykey(sc.nextInt())
-                                .getProductResult(true));
+        try {
+            CSVReader reader = new CSVReader(new FileReader(ProductsList.INPUT_FILE_NAME));
+            String[] nextLine;
+            while ((nextLine = reader.readNext()) != null) {
+                // nextLine[] is an array of values from the line
+                results.add(new Product(nextLine[0], nextLine[1], nextLine[2], Double.parseDouble(nextLine[3]), Integer.parseInt(nextLine[4]), Integer.parseInt(nextLine[5])));
             }
         } catch (FileNotFoundException e) {
-            System.out.printf("Unable to read input file \"%s\"\n", ProductsList.INPUT_FILE_NAME);
-            e.printStackTrace();
+            throw new RuntimeException(e);
+        } catch (CsvValidationException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+
 
         // Open an output stream, and serialize each StudentResult object to the stream
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(DATA_FILE_NAME))) {
@@ -254,29 +245,19 @@ public class ProductsList {
         writeFile(data, append);
     }
     private void writeFile(Map<String, Product> data, Boolean append) {
-        try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(INPUT_FILE_NAME, append))) {
-            if (data.size() == 0) {
-                out.write("".getBytes());
-            } else {
-                for (String key : data.keySet()) {
-                    Product product = data.get(key);
-                    StringBuffer sbf = new StringBuffer();//拼接内容
-                    sbf.append(product.getId()).append(",");
-                    sbf.append(product.getName()).append(",");
-                    sbf.append(product.getDescription()).append(",");
-                    sbf.append(product.getPrice()).append(",");
-                    sbf.append(product.getQuantity()).append(",");
-                    sbf.append(product.getPrimarykey());
-                    sbf.append(System.lineSeparator());
-                    String str = sbf.toString();
-                    byte[] b = str.getBytes();
-                    for (int i = 0; i < b.length; i++) {
-                        out.write(b[i]);
-                    }
-                }
+        try {
+            System.out.println(123);
+
+            CSVWriter writer = new CSVWriter(new FileWriter(INPUT_FILE_NAME, append));
+            for (String key : data.keySet()) {
+                Product product = data.get(key);
+                String[] record = {product.getId(), product.getName(), product.getDescription(), String.valueOf(product.getPrice()), String.valueOf(product.getQuantity()), String.valueOf(product.getPrimarykey())};
+                System.out.println(product);
+                writer.writeNext(record);
             }
-        }catch (Exception e) {
-            e.printStackTrace();
+            writer.close();
+        } catch (IOException e) {
+            System.out.println("Error writing to file: " + e);
         }
     }
     public void triggerSave() {

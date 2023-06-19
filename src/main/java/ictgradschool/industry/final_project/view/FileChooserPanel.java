@@ -60,6 +60,15 @@ public class FileChooserPanel extends SuperPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+
+        int result = JOptionPane.showConfirmDialog(null, "CSV File Format is mandatory!", "Confirmation", JOptionPane.YES_NO_OPTION);
+
+        if (result == JOptionPane.YES_OPTION) {
+        } else {
+            return;
+        }
+
+
         //Create a file chooser
         fc.setCurrentDirectory(new File("./src/main/resources"));
 
@@ -92,7 +101,15 @@ public class FileChooserPanel extends SuperPanel implements ActionListener {
                     System.out.println("Error creating file: " + ex.getMessage());
                 }
             }
+
             try {
+                String canonicalPath = selectedFile.getCanonicalPath();
+
+                if (!canonicalPath.endsWith(".csv")) {
+                    JOptionPane.showMessageDialog(null, "Please select/create a csv file");
+                    return;
+                }
+
                 this.app.tiggerFileSelect(selectedFile.getCanonicalPath());
             } catch (IOException ex) {
                 throw new RuntimeException(ex);

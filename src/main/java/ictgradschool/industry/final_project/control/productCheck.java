@@ -49,11 +49,13 @@ public class productCheck {
             id = UniqueIdentifierGenerator.getCharacters(ProductsList.getProductIds());
             action = productAction.Add;
         }
-        int newKey = 0;
+        int newKey = 1;
         try {
             newKey = Integer.parseInt(primarykey);
         } catch (NumberFormatException e) {
-            newKey = app.getProductsList().get(0).getPrimarykey() + 1;
+            if (app.getProductsList().size() > 0) {
+                newKey = app.getProductsList().get(0).getPrimarykey() + 1;
+            }
         }
 
         //add record
