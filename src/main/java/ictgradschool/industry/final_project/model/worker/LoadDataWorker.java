@@ -59,8 +59,6 @@ public class LoadDataWorker extends SwingWorker<List<Product>, Void> {
                         } else {
                             product.setQuantity(0);
                         }
-
-
                     }
                 }
             }

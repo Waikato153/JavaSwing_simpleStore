@@ -236,7 +236,12 @@ public class InventoryPanel extends ProductPanel {
         // Enable sorting for all columns
         tableView.setAutoCreateRowSorter(true);
         // Create a TableRowSorter and apply it to the table
-        sorter = new TableRowSorter<InventoryTableAdapter>(tableModel);
+        sorter = new TableRowSorter<InventoryTableAdapter>(tableModel) {
+            @Override
+            public boolean isSortable(int column) {
+                return column != 0 && column != 6;
+            }
+        };
         tableView.setRowSorter(sorter);
 
         // Create custom cell renderers and editors for specific columns

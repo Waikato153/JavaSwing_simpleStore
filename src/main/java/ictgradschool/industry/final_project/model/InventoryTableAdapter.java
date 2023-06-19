@@ -121,7 +121,9 @@ public class InventoryTableAdapter extends AbstractTableModel implements Product
                 System.out.println(app.getProductsList().products);
             }
         }
-        fireTableCellUpdated(rowIndex, columnIndex);
+        System.out.println(rowIndex + " " + columnIndex);
+        //fireTableCellUpdated(rowIndex, columnIndex);
+        fireTableDataChanged();
     }
 
 

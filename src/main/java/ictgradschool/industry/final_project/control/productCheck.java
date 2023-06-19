@@ -40,7 +40,7 @@ public class productCheck {
         } catch (NumberFormatException e) {
 
         }
-        if (newquantity > 0 == false) {
+        if (newquantity >= 0 == false) {
             JOptionPane.showMessageDialog(null, "Quantity must be a number!", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }

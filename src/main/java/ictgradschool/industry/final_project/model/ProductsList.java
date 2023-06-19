@@ -142,7 +142,12 @@ public class ProductsList {
     }
 
     public Product get(int index) {
-        return _indexedResults.get(index);
+        try {
+            return _indexedResults.get(index);
+        } catch (IndexOutOfBoundsException e) {
+            return null;
+        }
+
     }
 
 
@@ -172,6 +177,7 @@ public class ProductsList {
         try {
             CSVReader reader = new CSVReader(new FileReader(ProductsList.INPUT_FILE_NAME));
             String[] nextLine;
+            reader.readNext(); // skip the first line
             while ((nextLine = reader.readNext()) != null) {
                 // nextLine[] is an array of values from the line
                 results.add(new Product(nextLine[0], nextLine[1], nextLine[2], Double.parseDouble(nextLine[3]), Integer.parseInt(nextLine[4]), Integer.parseInt(nextLine[5])));
@@ -184,6 +190,7 @@ public class ProductsList {
             throw new RuntimeException(e);
         }
 
+        System.out.println("Read in " + results.size() + " results");
 
         // Open an output stream, and serialize each StudentResult object to the stream
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(DATA_FILE_NAME))) {
@@ -246,9 +253,11 @@ public class ProductsList {
     }
     private void writeFile(Map<String, Product> data, Boolean append) {
         try {
-            System.out.println(123);
 
             CSVWriter writer = new CSVWriter(new FileWriter(INPUT_FILE_NAME, append));
+            String[] header = {"id", "name", "description", "price", "quantity", "primarykey"};
+            writer.writeNext(header);
+
             for (String key : data.keySet()) {
                 Product product = data.get(key);
                 String[] record = {product.getId(), product.getName(), product.getDescription(), String.valueOf(product.getPrice()), String.valueOf(product.getQuantity()), String.valueOf(product.getPrimarykey())};
