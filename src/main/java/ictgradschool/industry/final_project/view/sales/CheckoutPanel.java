@@ -67,16 +67,12 @@ public class CheckoutPanel extends SuperPanel {
                 }
                 //write file first
                 try {
-
-
                     CheckoutWorker checkoutWorker = new CheckoutWorker(app, selectedFile.getCanonicalPath() + "/receipt.txt");
                     checkoutWorker.execute();
                     JOptionPane.showMessageDialog(null, "Checkout Success", "Success", JOptionPane.INFORMATION_MESSAGE);
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
-
-
             } else if (returnVal == JFileChooser.CANCEL_OPTION) {
                 System.out.println("File creation canceled.");
             }

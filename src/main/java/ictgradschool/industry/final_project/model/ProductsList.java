@@ -260,7 +260,7 @@ public class ProductsList {
 
             for (String key : data.keySet()) {
                 Product product = data.get(key);
-                String[] record = {product.getId(), product.getName(), product.getDescription(), String.valueOf(product.getPrice()), String.valueOf(product.getQuantity()), String.valueOf(product.getPrimarykey())};
+                String[] record = {product.getId(), product.getName(), product.getDescription(), String.valueOf(product.getPrice()), String.valueOf(product.getQuantity() >= 0 ? product.getQuantity() : 0), String.valueOf(product.getPrimarykey())};
                 System.out.println(product);
                 writer.writeNext(record);
             }

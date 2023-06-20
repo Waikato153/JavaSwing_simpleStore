@@ -145,7 +145,27 @@ public class ShoppingCartList {
 
         receiptBuilder.append("------------------------------------------------------\n");
 
-        for (ShoppingItem product : _indexedResults) {
+        List<ShoppingItem> combineResult = new ArrayList<>();
+
+        for (ShoppingItem item : _indexedResults) {
+            if (combineResult.size() == 0) {
+                combineResult.add(item);
+            } else {
+                boolean isExist = false;
+                for (ShoppingItem combineItem : combineResult) {
+                    if (combineItem.getProductId() == item.getProductId()) {
+                        combineItem.setQuantity(combineItem.getQuantity() + item.getQuantity());
+                        isExist = true;
+                    }
+                }
+                if (!isExist) {
+                    combineResult.add(item);
+                }
+            }
+        }
+
+
+        for (ShoppingItem product : combineResult) {
             List<String> wrappedLines = wrapText(product.getProduct().getName(), 15);
             for (int i = 0; i < wrappedLines.size(); i++) {
                 if (i == 0) {
@@ -158,7 +178,7 @@ public class ShoppingCartList {
 
         receiptBuilder.append("======================================================\n");
 
-        receiptBuilder.append(String.format("%-5s  %-20s  %-6s %-4s  $%-2s", "", "TOTAL", "", "",getTotalPrice()));
+        receiptBuilder.append(String.format("%-5s  %-20s  %-5s %-4s  $%-2s", "", "TOTAL", "", "",getTotalPrice()));
 
         return receiptBuilder.toString();
     }

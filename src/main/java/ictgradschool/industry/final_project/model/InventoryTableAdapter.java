@@ -111,7 +111,9 @@ public class InventoryTableAdapter extends AbstractTableModel implements Product
             } else {
                 ShoppingItem shoppingItem = new ShoppingItem(item.getId(), 1, item);
                 app.getShoppingCartList().addShoppingCartResult(shoppingItem);
-                item.setQuantity(item.getQuantity() - 1);
+                if (item.getQuantity() > 0) {
+                    item.setQuantity(item.getQuantity() - 1);
+                }
 
                 if (item.getQuantity() <= 0) {
                     model.addSelect(item.getId());
