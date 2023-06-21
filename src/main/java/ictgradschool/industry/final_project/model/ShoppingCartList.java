@@ -184,7 +184,7 @@ public class ShoppingCartList {
 
         receiptBuilder.append("======================================================\n");
 
-        receiptBuilder.append(String.format("%-5s  %-20s  %-7s %-5s  $%-2s\n", "", "TOTAL", "", "", getTotalPrice()));
+        receiptBuilder.append(String.format("%-5s  %-20s  %-5s %-5s  $%-2s\n", "", "TOTAL", "", "", getTotalPrice()));
         receiptBuilder.append("------------------------------------------------------");
         return receiptBuilder.toString();
     }
