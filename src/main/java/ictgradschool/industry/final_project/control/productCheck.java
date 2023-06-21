@@ -28,6 +28,12 @@ public class productCheck {
         double newprice = 0;
         try {
             newprice = Double.parseDouble(price);
+
+            if (newprice >= 0 == false) {
+                JOptionPane.showMessageDialog(null, "Price must be a positive number!", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(null, "Price must be a number!", "Error", JOptionPane.ERROR_MESSAGE);
             return;
