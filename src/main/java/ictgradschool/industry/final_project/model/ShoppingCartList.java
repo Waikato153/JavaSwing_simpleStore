@@ -147,9 +147,12 @@ public class ShoppingCartList {
 
         List<ShoppingItem> combineResult = new ArrayList<>();
 
+        int priceLenth = 0;
+
         for (ShoppingItem item : _indexedResults) {
             if (combineResult.size() == 0) {
                 combineResult.add(item);
+                priceLenth = String.valueOf(item.getProduct().getPrice()).length();
             } else {
                 boolean isExist = false;
                 for (ShoppingItem combineItem : combineResult) {
@@ -159,6 +162,8 @@ public class ShoppingCartList {
                     }
                 }
                 if (!isExist) {
+                    int newLength = String.valueOf(item.getProduct().getPrice()).length();
+                    priceLenth = newLength > priceLenth ? newLength : priceLenth;
                     combineResult.add(item);
                 }
             }
@@ -169,7 +174,8 @@ public class ShoppingCartList {
             List<String> wrappedLines = wrapText(product.getProduct().getName(), 15);
             for (int i = 0; i < wrappedLines.size(); i++) {
                 if (i == 0) {
-                    receiptBuilder.append(String.format("%-5s  %-20s  ($%-2s)  %-2s  $%-2s%n", String.valueOf(product.getQuantity()), wrappedLines.get(i), product.getProduct().getPrice(),"", product.getProduct().getPrice() * product.getQuantity()));
+                    int priceSpace = priceLenth - String.valueOf(product.getProduct().getPrice()).length();
+                    receiptBuilder.append(String.format("%-5s  %-20s  ($%-2s)  %-2s  %-2s%n", String.valueOf(product.getQuantity()), wrappedLines.get(i), product.getProduct().getPrice(),"", " ".repeat(priceSpace)+ "$" + product.getProduct().getPrice() * product.getQuantity()));
                 } else {
                     receiptBuilder.append(String.format("%-5s  %-20s%n", "", wrappedLines.get(i)));
                 }
@@ -178,8 +184,8 @@ public class ShoppingCartList {
 
         receiptBuilder.append("======================================================\n");
 
-        receiptBuilder.append(String.format("%-5s  %-20s  %-5s %-4s  $%-2s", "", "TOTAL", "", "",getTotalPrice()));
-
+        receiptBuilder.append(String.format("%-5s  %-20s  %-7s %-5s  $%-2s\n", "", "TOTAL", "", "", getTotalPrice()));
+        receiptBuilder.append("------------------------------------------------------");
         return receiptBuilder.toString();
     }
     private static List<String> wrapText(String text, int lineLength) {

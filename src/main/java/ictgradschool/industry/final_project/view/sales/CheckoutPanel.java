@@ -67,7 +67,7 @@ public class CheckoutPanel extends SuperPanel {
                 }
                 //write file first
                 try {
-                    CheckoutWorker checkoutWorker = new CheckoutWorker(app, selectedFile.getCanonicalPath() + "/receipt.txt");
+                    CheckoutWorker checkoutWorker = new CheckoutWorker(app, selectedFile.getCanonicalPath() + "/receipt" + System.currentTimeMillis() + ".txt");
                     checkoutWorker.execute();
                     JOptionPane.showMessageDialog(null, "Checkout Success", "Success", JOptionPane.INFORMATION_MESSAGE);
                 } catch (IOException ex) {
